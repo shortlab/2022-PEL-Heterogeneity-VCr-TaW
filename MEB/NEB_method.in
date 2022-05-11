@@ -1,0 +1,44 @@
+# nudged elastic band (NEB) analysis
+# Stefano Segantin, July 2021
+# Politecnico di Torino
+
+# ---------- INITIALIZATION ----------------------------------------------------
+units		metal  # A ps K bar eV
+dimension	3
+boundary	p p p
+
+variable	ao equal
+# ---------- GEOMETRY DEFINITION -----------------------------------------------
+lattice
+read_data
+
+# ---------- create vacancy ----------------------------------------------------
+group   vacancy id
+delete_atoms
+
+# ---------- FORCE FIELD -------------------------------------------------------
+pair_style
+pair_coeff
+# ---------- SETTINGS ----------------------------------------------------------
+# COMPUTES
+compute	csym all centro/atom bcc
+compute	eng all pe/atom
+compute	eatoms all reduce sum c_eng
+# VARIABLES
+variable	N equal count(all)
+variable	Eavg equal c_eatoms/$N
+
+# ---------- DYNAMICS ----------------------------------------------------------
+# ---------- energy minimization -----------------------------------------------
+# PRINT-SCREEN
+thermo
+thermo_style
+minimize
+
+# --------- NEB analysis -------------------------------------------------------
+variable	u uloop
+reset_timestep	0
+fix		1 all neb
+timestep        0.01
+min_style
+neb		 final
