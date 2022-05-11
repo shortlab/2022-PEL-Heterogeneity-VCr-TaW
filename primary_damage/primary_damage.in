@@ -1,0 +1,104 @@
+# Primary damage
+# Stefano Segantin, July 2021
+# Politecnico di Torino
+
+# ---------- INITIALIZATION ----------------------------------------------------
+units		     metal  # A ps K bar eV
+dimension	   3
+boundary	   p p p
+
+# -------- VARIABLES -----------------------------------------------------------
+variable	  ao equal
+variable    lBox equal
+variable    LBox equal ${lBox}*2
+variable    corel equal "v_lBox - 1.0"
+
+# ---------- start loop --------------------------------------------------------
+variable    loopNum loop
+
+variable    pkaIDSeed equal
+variable    angle1Seed equal
+variable    angle2Seed equal
+
+variable    pkaEnergy equal   # eV
+
+# ---------- GEOMETRY DEFINITION -----------------------------------------------
+lattice
+region		  whole block
+read_data
+group       core region coregion
+group       boundary subtract all core
+
+# --------- FORCE FIELD -------------------------------------------------------
+mass    1
+
+pair_style	hybrid/overlay eam/alloy  zbl
+pair_coeff	* * eam/alloy
+pair_coeff zbl
+
+neigh_modify    every 1 delay 0 check yes
+
+# ---------- DYNAMICS ----------------------------------------------------------
+# PRINT-SCREEN
+thermo
+thermo_style
+minimize
+# --------- set temperature ----------------------------------------------------
+velocity         all create
+fix		           1 all npt
+run
+unfix           1
+# --------- run PKA cascade ----------------------------------------------------
+# random choice of the PKA
+variable         randpka equal round(random())
+group            PKA id ${mypka}
+variable         pkaType equal type[v_mypka]
+variable         pkaMass equal mass(PKA)
+variable         xpka equal x[v_mypka]
+variable         ypka equal y[v_mypka]
+variable         zpka equal z[v_mypka]
+variable          Dx equal "-v_xpka"
+variable          Dy equal "-v_ypka"
+variable          Dz equal "-v_zpka"
+
+# set PKA velocity
+variable    angle1  equal random()
+variable    angle2  equal random()
+variable    pkaV  equal   # A/ps
+variable    pkaVz  equal
+variable    pkaVx  equal
+variable    pkaVy  equal
+
+displace_atoms   all move v_Dx v_Dy v_Dz units box
+fix              2 all nve
+fix              3 boundary temp/rescale  # T bath
+fix		           4 all dt/reset 1 1.0e-6 1.0e-3 0.05 units box
+velocity         PKA set v_pkaVx v_pkaVy v_pkaVz units box
+run
+
+# ---------- minimize ----------------------------------------------------------
+# minimize and dump
+compute     CNA  all cna/atom ${cnacut}
+compute     PE all pe/atom
+compute     csym all centro/atom bcc
+dump		    5 all custom
+minimize
+undump      5
+
+# unfix the adaptive timestep, the nve and nvt ensembles and clear all the groups
+unfix       2
+unfix       3
+unfix       4
+group       PKA clear
+group       V clear
+group       Ti clear
+group       Cr clear
+group       core clear
+group       boundary clear
+# ---------- OUTPUTS -----------------------------------------------------------
+# WRITE FILES
+write_data
+variable    mype equal pe
+
+next        loopNum
+jump        SELF
