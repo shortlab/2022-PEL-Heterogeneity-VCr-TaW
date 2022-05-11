@@ -2,7 +2,7 @@
 Repository for Stefano Segantin's MD manuscript
 
 
-# 2021 - Energy landscape / irradiation resistance
+## 2021 - Energy landscape / irradiation resistance
 Data with generic input files and main results for the three models:
 - Quasi-static (system characterization)
 - meb evaluation (NEB method)
