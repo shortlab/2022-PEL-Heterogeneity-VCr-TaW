@@ -2,8 +2,8 @@
 Repository for Stefano Segantin's MD manuscript
 
 
-## Energy landscape / irradiation resistance
+## Potential Energy Landscape / irradiation resistance
 Data with generic input files and main results for the three models:
 - Quasi-static (system characterization)
-- meb evaluation (NEB method)
+- MEB (Migration Energy Barriers) evaluation (NEB method)
 - primary damage (subsequent collision cascade algorithm)
