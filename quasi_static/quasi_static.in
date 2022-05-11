@@ -1,0 +1,61 @@
+# Quasi-static simulation
+# Stefano Segantin, July 2021
+# Politecnico di Torino
+
+# ---------- INITIALIZATION ----------------------------------------------------
+
+units		     metal  # A ps K bar eV
+dimension	   3
+boundary	   p p p
+
+# -------- variables -----------------------------------------------------------
+variable	  ao equal
+variable    lBox equal
+variable    LBox equal ${lBox}*2
+
+variable    f2 equal
+variable    F2 equal 100*${f2}
+# ---------- GEOMETRY DEFINITION -----------------------------------------------
+lattice
+region		  whole block
+create_box	 whole
+lattice
+create_atoms
+
+set         type 1 type/fraction 2
+
+# ---------- FORCE FIELD -------------------------------------------------------
+pair_style
+pair_coeff	* *
+
+# ---------- SETTINGS ----------------------------------------------------------
+# COMPUTES
+compute	   csym all centro/atom bcc
+compute	   eng all pe/atom
+
+# VARIABLES
+variable  mype equal pe
+variable	N equal count(all)
+
+# ---------- DYNAMICS ----------------------------------------------------------
+# PRINT-SCREEN
+thermo
+thermo_style	
+
+# --------- MC swap and minimization -------------------------------------------
+velocity   all create
+fix		     1 all npt
+fix		     2 all atom/swap
+run
+minimize
+unfix		  1
+unfix		  2
+
+# ---------- OUTPUTS -----------------------------------------------------------
+
+# WRITE FILES
+variable  aox equal lx/${LBox}
+print     "${mype} ${aox}" append
+
+write_restart
+write_data
