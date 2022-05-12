@@ -14,15 +14,15 @@ In order to proceed it is necessary to have installed:
 - LAMMPS molecular dynamics open source code
 - Have LAMMPS installed as Python module
 
-It is necessary to download 
+It is necessary to download the interatomic potential libraries discussed in the paper from some [repository](https://www.ctcms.nist.gov/potentials/) as the local path of the files is required in the [pair coefficents](https://docs.lammps.org/pair_coeff.html) command present in every LAMMPS input file.
 
-The use High Performance supercomputers is strongly suggested.
+The use of High Performance supercomputers is recommended.
 It is also strongly suggested to read the [LAMMPS manual](https://docs.lammps.org/Intro.html) in order to understand all the command used and how to tune the command arguments.
 
 Additional information and modeling parameters applied are described in the paper methodology.
 
 ## 1) Quasi-static model
-The input file of this model is the "quasi_static.in" file in the relative folder. It is just necessary to complete the commands left blank with the requirement arguments with values that can be arbitrary, described in the paper or specific of the material applied. Here you can find listed some main modeling choices made in the work:
+The input file of this model is the "quasi_static.in" file in the relative folder. It is just necessary to complete the commands left blank with the requirement arguments with values that can be arbitrary, described in the paper or specific of the material studied. Here you can find listed some main modeling choices made in the work:
 - In the work the total [box size](https://docs.lammps.org/region.html) was set equal to 40x40x40 [lattice constants](https://docs.lammps.org/lattice.html) and [created](https://docs.lammps.org/create_box.html) (i.e. 128'000 particles for BCC cristals)
 - The [temperature](https://docs.lammps.org/velocity.html) was set equal to 300 K
 - The hybrid Monte Carlo + Molecular Dynamics [swap method](https://docs.lammps.org/fix_atom_swap.html) was set to perform 500 swap attempts every 50 timesteps for a total of 1 million swap attempts
@@ -37,7 +37,7 @@ It is suggested to run the simulation 11 times for each binary mixed system in o
 It is also possibe to embed the script in a [variable-loop](https://docs.lammps.org/variable.html) command in order to authomatize such parametrization.
 
 ## 2) Migration Energy Barriers model
-For this model a Python wrapper has been built as well as a couple of Phython functions. The [Nudged Elastic Band (NEB)](https://docs.lammps.org/fix_neb.html) method relies on the fact that, in addition to the classic input file, interatomic potential pair coefficient library file and the initial [data](https://docs.lammps.org/write_data.html), a "final" file is given to LAMMPS in which the IDs of one or more atoms in the box is given as well as the coordinates of such atoms. LAMMPS performs a "forced migration" of such atoms and records the path that requires the minimum energy for the migration to happen. The work studies the heterogeneity of such energy values (with focus on the migration of vacancies) for mixed systems. Hence, it was necessary to perform a huge number of different migrations. The Python files allow to do that automatically. The files work as follows:
+For this model a Python wrapper has been built as well as a some of Phyton functions. The [Nudged Elastic Band (NEB)](https://docs.lammps.org/fix_neb.html) method relies on the fact that, in addition to the classic input file, interatomic potential pair coefficient library file and the initial [data](https://docs.lammps.org/write_data.html), a "final" file is given to LAMMPS in which the IDs of one or more atoms in the box is given as well as some spatial coordinates. LAMMPS performs a "forced migration" of such atoms to the given coordinates and records the path that requires the minimum energy for the migration to happen. The work studies the heterogeneity of such energy values (with focus on the migration of vacancies) for mixed systems. Hence, it was necessary to perform a huge number of different migrations. The Python files allow to do that automatically. The files work as follows:
 
 - "NEB_stats.py": opens the initial [data](https://docs.lammps.org/write_data.html) or a [read/restart](https://docs.lammps.org/read_restart.html) file and collects some main information (box size, microstructure type, particles velocities, particles ID and coordinates and, for each particle, the ID and coordinates of all the Nearest Neighbor (NN) particles) and writes the "final" file
 - "NEB_readout.py": it opens the "log.lammps" file, which is one of the simulation output files and postprocesses the results in order to identify and record the MEB values evaluated in the simulation
