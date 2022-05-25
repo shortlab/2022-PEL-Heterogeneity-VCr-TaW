@@ -1,6 +1,8 @@
 # 2022-PEL-Heterogeneity-VCr-TaW
 Repository for Stefano Segantin's MD manuscript.
 
+<a href="https://www.zenodo.org/badge/latestdoi/490487100"><img src="https://www.zenodo.org/badge/490487100.svg" alt="DOI"></a>
+
 This repository provides some example input files and scripts regarding the molecular dynamics modeling of the
 Some example results are also provided for each of the models.
 
